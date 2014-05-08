@@ -1,0 +1,54 @@
+[{
+		"id": 1,
+		"name": "Coca Cola ",
+		"description": "33ml can  w: 6.5cm h: 12cm d: 6.5cm",
+		"width": 6.5,
+		"height": 12,
+		"image": "1.png",
+		"brand": "",
+		"manufacturer": "",
+		"category": "",
+		"subcategory": "",
+		"format": "",
+		"barcode": "xxxxxx"
+	},{
+		"id": 2,
+		"name": "Coca Cola ",
+		"description": "0.5l bottle w: 25cm h: 5cm d: 5cm",
+		"width": 5,
+		"height": 25,
+		"image": "2.png",
+		"brand": "",
+		"manufacturer": "",
+		"ategory": "",
+		"subcategory": "",
+		"format": "",
+		"barcode": "xxxxxx"
+	},{
+		"id": 3,
+		"name": "Coca Cola ",
+		"description": "2L bottle w: 10cm h: 30cm d: 10cm",
+		"width": 10,
+		"height": 30,
+		"image": "3.png",
+		"brand": "",
+		"manufacturer": "",
+		"category": "",
+		"subcategory": "",
+		"format": "",
+		"barcode": "xxxxxx"
+	},{
+		"id": 4,
+		"name": "Intdeterminately Specific Product",
+		"description": "1 line of description w: 40cm h: 40cm d: 40cm",
+		"width": 30,
+		"height": 40,
+		"image": "4.png",
+		"brand": "",
+		"manufacturer": "",
+		"category": "",
+		"subcategory": "",
+		"format": "",
+		"barcode": "xxxxxx"
+	}
+]

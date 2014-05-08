@@ -1,0 +1,135 @@
+[{
+	"id": 1,
+	"name": "Oral Care",
+	"parent": 0
+},{
+	"id": 2,
+	"name": "Toothpaste",
+	"parent": 1
+},{
+	"id": 3,
+	"name": "Toothbrush",
+	"parent": 1
+},{
+	"id": 4,
+	"name": "Daily use mouthwash",
+	"parent": 1
+},{
+	"id": 5,
+	"name": "Medicated mouthwash",
+	"parent": 1
+},{
+	"id": 6,
+	"name": "Dentures",
+	"parent": 1
+},
+
+{
+	"id": 7,
+	"name": "Skin Care",
+	"parent": 0
+},{
+	"id": 8,
+	"name": "Dry Skin",
+	"parent": 7
+},{
+	"id": 9,
+	"name": "Sensitive skin",
+	"parent": 7
+},{
+	"id": 10,
+	"name": "Lip Care",
+	"parent": 7
+},{
+	"id": 11,
+	"name": "Clear skin",
+	"parent": 7
+},{
+	"id": 12,
+	"name": "Suncare",
+	"parent": 7
+},
+
+{
+	"id": 13,
+	"name": "Health &amp; Wellness",
+	"parent": 0
+},{
+	"id": 14,
+	"name": "Winter Remedies",
+	"parent": 13
+},{
+	"id": 15,
+	"name": "Pain Relief",
+	"parent": 13
+},{
+	"id": 16,
+	"name": "NRT",
+	"parent": 13
+},{
+	"id": 17,
+	"name": "Allergy Relief",
+	"parent": 13
+},{
+	"id": 18,
+	"name": "Sleep &amp; Stress",
+	"parent": 13
+},{
+	"id": 19,
+	"name": "Cold sore Treatment",
+	"parent": 13
+},{
+	"id": 20,
+	"name": "Heartburn &amp; Indigestion",
+	"parent": 13
+},{
+	"id": 21,
+	"name": "Skin Flare up",
+	"parent": 13
+},{
+	"id": 22,
+	"name": "Snore Relief",
+	"parent": 13
+},{
+	"id": 23,
+	"name": "Slimming Aids",
+	"parent": 13
+},{
+	"id": 24,
+	"name": "Vitamins",
+	"parent": 13
+},
+
+{
+	"id": 25,
+	"name": "Adult Specialist Nutrition",
+	"parent": 0
+},{
+	"id": 26,
+	"name": "Performance - Rebuild and Recover",
+	"parent": 25
+},{
+	"id": 27,
+	"name": "Performance - Mass and Size",
+	"parent": 25
+},{
+	"id": 28,
+	"name": "Performance - Strength and Power",
+	"parent": 25
+},{
+	"id": 29,
+	"name": "Performance - Lean Definition",
+	"parent": 25
+},{
+	"id": 30,
+	"name": "Performance - Energy and Hydration",
+	"parent": 25
+},{
+	"id": 31,
+	"name": "Weight Management",
+	"parent": 25
+},{
+	"id": 32,
+	"name": "Wellbeing",
+	"parent": 25
+}]

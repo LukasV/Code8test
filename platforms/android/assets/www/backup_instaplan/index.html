@@ -1,0 +1,636 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Instaplan</title>
+	<meta name="viewport" content="width=device-width">
+	<!--meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'-->
+	<!--link rel="stylesheet" href="css/demo-files/demo.css"-->
+	<!--link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"-->
+	<link rel="stylesheet" href="css/pure-css-theme.css">
+	<link rel="stylesheet" href="css/selectize.default.css">
+	<link rel="stylesheet" href="css/main.css">
+	<!--script type="text/javascript" src="js/vendors/jquery.min.js"></script-->
+	<script type="text/javascript" src="js/vendors/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="js/vendors/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/vendors/jquery.ui.touch-punch.min.js"></script>
+	<script type="text/javascript" src="js/vendors/jquery.panzoom.js"></script>
+	<script type="text/javascript" src="js/vendors/jquery.mousewheel.js"></script>
+	<script type="text/javascript" src="js/vendors/jquery.nicescroll.min.js"></script>
+	<script type="text/javascript" src="js/vendors/underscore-min.js"></script>
+	<script type="text/javascript" src="js/vendors/backbone-min.js"></script>
+	<script type="text/javascript" src="js/vendors/backbone-relational.min.js"></script>
+	<script type="text/javascript" src="js/vendors/backbone.localStorage.js"></script>
+	<!--script type="text/javascript" src="js/vendors/backbone.paginator.js"></script-->
+	<script type="text/javascript" src="js/vendors/selectize.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="phonegap.js"></script>
+	<!--script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/vendors/jquery.ui.touch-punch.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone-relational/0.8.6/backbone-relational.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone-localstorage.js/1.1.0/backbone.localStorage-min.js"></script-->
+	<!--script type="text/javascript" src="js/vendors/backbone-pageable.js"></script>
+	<script type="text/javascript" src="js/vendors/backgrid.js"></script>
+	<script type="text/javascript" src="js/vendors/backgrid-paginator.js"></script-->
+	<script type="text/javascript">
+		function htmlEncode(value){
+			return $('<div/>').text(value).html();
+		}
+	</script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
+	<script src="http://code.createjs.com/tweenjs-0.5.0.min.js"></script>
+	<script src="http://code.createjs.com/movieclip-0.7.0.min.js"></script>
+	<script src="http://code.createjs.com/preloadjs-0.4.0.min.js"></script>
+	<script src="js/intro.js"></script>
+	<script>
+var canvas, stage, exportRoot;
+
+function init() {
+	canvas = document.getElementById("canvas");
+	images = images||{};
+
+	var loader = new createjs.LoadQueue(false);
+	loader.addEventListener("fileload", handleFileLoad);
+	loader.addEventListener("complete", handleComplete);
+	loader.loadManifest(lib.properties.manifest);
+}
+
+function handleFileLoad(evt) {
+	if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
+}
+
+function handleComplete() {
+	exportRoot = new lib.InstaAnimationHTMLHalf();
+
+	stage = new createjs.Stage(canvas);
+	stage.addChild(exportRoot);
+	stage.update();
+
+	createjs.Ticker.setFPS(lib.properties.fps);
+	createjs.Ticker.addEventListener("tick", stage);
+}
+	</script>
+</head>
+<body>
+
+<div id="ipad" class="clearfix mhl ptl">
+	<div id="content">
+		<!--canvas id="canvas" width="1024" height="768" style="background-color:#FFFFFF"></canvas-->
+		<canvas id="canvas" width="2048" height="1536" style="background-color:#FFFFFF"></canvas>
+		<div class="page"></div>
+	</div>
+</div>
+
+<script type="text/template" id="home-template">
+	<div class="landing-page">
+		<ul>
+			<li><a href="#/projects">My Projects</a></li>
+			<li><a href="#" id="new-project">New Project</a></li>
+		</ul>
+	</div>
+</script>
+
+<script type="text/template" id="new-project-template">
+	<div class="popupOld">
+		<form class="add-project-form" action="#" >
+			<h2>Project Name</h2>
+			<p>Give your project a name</p>
+			<fieldset>
+				<label for="projectname"><input type="text" id="projectname" name="projectname" placeholder="Project name" ></label>
+				<input type="hidden" value="27.2.2014 16:00" name="lastsaved">
+				<input type="submit" id="add-new-project" value="Create Project">
+			</fieldset>
+		</form>
+	</div>
+</script>
+
+<script type="text/template" id="project-list-template">
+	<h2>My Projects</h2>
+	<a href="#" id="new-project">New Project</a>
+    <table class="table striped">
+		<thead>
+			<tr>
+				<th>Project Name</th><th>Last Saved</th><th></th>
+			</tr>
+		</thead>
+		<tbody id="project-list"></tbody>
+	</table>
+	<p><a href="#/">&lt; Home</a></p>
+</script>
+
+<script type="text/template" id="project-item-template">
+	<td><%= htmlEncode(project.get('projectname')) %></td>
+	<td><%= htmlEncode(project.get('lastsaved')) %></td>
+	<td class="last"><a href="#/edit/<%= project.id %>">Open</a> <a href="#" class="generate">Generate PDF</a> <a href="#/delete/<%= project.id %>">Delete</a></td>
+</script>
+
+<script type="text/template" id="project-edit-template">
+	<div class="project-edit-container">
+		<header class="header">
+			<a href="#/projects" class="back"><!--&lt;--></a>
+			<h1>
+				<!--input type="text" value="<% print( htmlEncode(project.get('projectname')) ) %>" id="project-name-edit"-->
+				<span><% print( htmlEncode(project.get('projectname')) ) %></span>
+			</h1>
+			<div id="popup"></div>
+			<div class="zooming">
+				<button class="zoom-in">Zoom In</button>
+				<button class="zoom-out">Zoom Out</button>
+				<input type="range" class="zoom-range">
+				<button class="reset">Reset</button>
+				<!--a href="" class="button bp">+</a>
+				<a href="" class="button bm">-</a-->
+			</div>
+		</header>
+		<div class="bays-scrollable">
+			<div id="bays-container">
+				<div id="bay-list"></div>
+				<div class="bay new"><button class="addBay"></button></div>
+			</div>
+		</div>
+		<div id="product-bar">
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="popup-bay-template">
+	<div class="popup">
+		<div class="popupCnt">
+			<h2>Create a bay</h2>
+			<form action="" id="setDimensions" >
+				<fieldset>
+					<table>
+						<tbody>
+							<tr>
+								<td>
+									<label for="formWidth">Width</label>
+								</td>
+								<td>
+									<a href="" class="button minus">-</a>
+									<input type="number" min="50" max="200" step="10" value="100" id="formWidth" id="formWidth" >
+									<a href="" class="button plus">+</a>
+									<!--50 - 200-->
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label for="formHeight">Height</label>
+								</td>
+								<td>
+									<a href="" class="button minus">-</a>
+									<input type="number" min="100" max="250" step="10" value="200" id="formHeight" id="formHeight">
+									<!--input type="text" value="200" id="formHeight" id="formHeight"  -->
+									<a href="" class="button plus">+</a>
+									<!--100-250-->
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label for="fNumber">Shelves</label>
+								</td>
+								<td>
+									<a href="" class="button minus">-</a>
+									<input type="number" min="1" max="25" step="1" value="5" id="fNumber" id="fNumber" >
+									<a href="" class="button plus">+</a>
+									<!-- depends...-->
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<input type="submit" value="Go">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="bay-item-template">
+	<div class="full-height">
+		<div class="full-height2">
+			<div class="wrap" >
+				<button class="icon-minus1 bay-edit"></button>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="shelf-item-template">
+		<div class="controls"><button data-pos="<%= index %>" class="icon-plus"></button><button data-pos="<%= index %>" class="icon-minus"></button></div>
+</script>
+
+<script type="text/template" id="product-bar-template">
+	<div id="product-bar-head">
+		<div id="resources-link"><a href="" class="">i</a></div>
+		<div id="barIcon"><a href="" class="pbClick easeOut"></a><span class="ico2"></span></div>
+		<div id="search">
+			<form action="#" id="searchForm">
+				<fieldset>
+					<input type="submit" id="searchSubmit" value="">
+					<input type="text" value="" name="search" id="searchString" placeholder="Search">
+				</fieldset>
+			</form>
+		</div>
+		<ul class="productmenu">
+			<li><a href="" class="active">All</a></li>
+			<li><a href="">Oral Care</a></li>
+			<li><a href="">Skin Care</a></li>
+			<li><a href="">Health &amp; Wellness</a></li>
+			<li><a href="">Nutrition</a></li>
+		</ul>
+	</div>
+	<div id="product-contentWrap">
+		<div id="product-content">
+			<div class="product fake"><a href="" id="add-product">New Product</a></div>
+			<!--div id="grid">GRID</div>
+			<div id="paginator">PAGINATOR</div-->
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="product-item-template">
+	<div class="product" data-pid="<%= pId %>" data-name="<%= htmlEncode(pName) %>" data-description="<%= htmlEncode(pDescription) %>" data-img="<%= pImage %>" data-width="<%= pWidth %>" data-height="<%= pHeight %>">
+		<div class="img"><a href="" class="delete"></a><img src="img/products/<%= pImage %>"></div>
+		<div class="cnt">
+			<h2><%= htmlEncode(pName) %></h2>
+			<p><%= htmlEncode(pDescription) %></p>
+		</div>
+	</div>
+</script>
+
+<!-- Popups - bay / shelf edit -->
+<script type="text/template" id="popup-bay-edit">
+	<div id="bay-edit" class="popupOld ea1">
+		<h2>Edit bay</h2>
+		<ul class="buttons">
+			<li><a href="" class="a1">Edit Products</a></li>
+			<li><a href="" class="a2">Edit Shelves</a></li>
+		</ul>
+		<p class="p1">Remove product individually or clear a row entirely</p>
+		<p class="p2">Add or remove shelves</p>
+		<p><a href="" class="button2">Delete Bay</a> <a href="" class="button">Done</a></p>
+	</div>
+</script>
+<script type="text/template" id="popup-bay-delete">
+	<div id="bay-delete" class="popupOld">
+		<h2>Delete Bay?</h2>
+		<p>Removing this bay will delete all products on the bay.</p>
+		<p><a href="" class="button">Cancel</a> <a href="" class="button2">Delete</a> </p>
+	</div>
+</script>
+<script type="text/template" id="popup-shelf-delete">
+	<div id="shelf-delete" class="popupOld">
+		<h2>Delete Shelf?</h2>
+		<p>Removing this shelf will delete all products on the shelf.</p>
+		<p><a href="" class="button">Cancel</a> <a href="" class="button2">Delete</a> </p>
+	</div>
+</script>
+<script type="text/template" id="popup-shelf-nofit">
+	<div id="shelf-nofit" class="popupOld">
+		<h2>Sorry!</h2>
+		<p>Product doesn't fit on this shelf.</p>
+		<p><a href="" class="button">OK</a></p>
+	</div>
+</script>
+<script type="text/template" id="popup-shelf-nofit2">
+	<div id="shelf-nofit" class="popupOld">
+		<h2>Sorry!</h2>
+		<p>You can't place a shelf here - one or more products on the shelf below are in the way!</p>
+		<p><a href="" class="button">OK</a></p>
+	</div>
+</script>
+
+<!-- Resources -->
+<script type="text/template" id="popup-resources">
+	<div class="popup">
+		<div class="popupCnt resources">
+			<div class="resource-list">
+				<h2>My Resources</h2>
+			    <table class="table striped">
+					<thead>
+						<tr>
+							<th>Project Name</th>
+							<th class="last">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="resource-list">
+						<tr>
+							<td>Sample project</td>
+							<td class="last"><a href="" class="open-resource">Open</a></td>
+						</tr>
+					</tbody>
+				</table>
+				<br>
+				<p class="cancel"><a href="">cancel</a></p>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/template" id="popup-resource">
+	<div class="popup">
+		<div class="popupCnt resource">
+			<div class="resource-list">
+				<h2><a href="" class="back2Res">&lt;&nbsp;</a>Sample project</h2>
+				<iframe src="<% print(myUrl) %>" width="100%" height="430" frameborder="0"></iframe>
+				<br>
+				<p class="cancel"><a href="">cancel</a></p>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/template" id="popup-pdf">
+	<div class="popup pagePopup">
+		<div class="popupCnt resource">
+			<div class="resource-list">
+				<h2><a href="#/projects" class="back2Res">&lt;&nbsp; Preview plan:</a> Sample project <a href="" class="button">Email PDF</a></h2>
+				<iframe src="<% print(myUrl) %>" width="100%" height="430" frameborder="0"></iframe>
+				<br>
+				<p class="cancel"><a href="#/projects">cancel</a></p>
+			</div>
+		</div>
+	</div>
+</script>
+
+<!-- New Product -->
+<script type="text/template" id="new-product1">
+	<div class="popup">
+		<div class="popupCnt new-product s1">
+			<div class="resource-list">
+				<h2>Add New Product</h2>
+				<form action="">
+					<p class="large">
+						<label for="product-name">Product name</label><br>
+						<input type="text" name="product-name" id="product-name" placeholder="Burts Bees Orange Essence" value="<% print( htmlEncode(product.get('name')) ) %>">
+					</p>
+					<p class="wh">
+						<label for="product-height">Height</label> &nbsp;
+						<a href="" class="button minus">-</a>
+						<input type="number" name="product-height" id="product-height" placeholder="18cm" min="0" value="<% print( product.get('height') ) %>">
+						<a href="" class="button plus">+</a>
+						&nbsp; &nbsp; &nbsp; &nbsp;
+						<label for="product-width">Width</label> &nbsp;
+						<a href="" class="button minus">-</a>
+						<input type="number" name="product-width" id="product-width" placeholder="5cm" min="0" value="<% print( product.get('height') ) %>">
+						<a href="" class="button plus">+</a>
+					</p>
+				</form>
+				<br>
+				<div class="cancel">
+					<div class="fl"><a href="">cancel</a></div>
+					<div class="fr">
+						<a href="" class="button next">Next &gt;</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/template" id="new-product2">
+	<div class="popup">
+		<div class="popupCnt new-product s2">
+			<div class="resource-list">
+				<h2>Add New Product</h2>
+				<form action="">
+					<p class="large">
+						<label for="product-name">Select an Image</label><br>
+						<a href="" class="button">Choose from library</a>
+					</p>
+					<p class="small">
+						<label for="product-height">or</label><br>
+						<a href="" class="button">Take a photo</a>
+					</p>
+				</form>
+				<br>
+				<div class="cancel">
+					<div class="fl"><a href="">cancel</a></div>
+					<div class="fr">
+						<a href="" class="button back">&lt; Back</a>
+						<a href="" class="button next">Next &gt;</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/template" id="new-product3">
+	<div class="popup">
+		<div class="popupCnt new-product s3">
+			<div class="resource-list">
+				<h2>Add New Product</h2>
+				<form action="">
+					<p class="large">
+						<label for="product-name">Crop Image</label><br>
+						<img src="img/temp-crop.png" alt="">
+					</p>
+				</form>
+				<br>
+				<div class="cancel">
+					<div class="fl"><a href="">cancel</a></div>
+					<div class="fr">
+						<a href="" class="button back">&lt; Back</a>
+						<a href="" class="button next">Next &gt;</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/template" id="new-product4">
+	<div class="popup">
+		<div class="popupCnt new-product s4">
+			<div class="resource-list">
+				<h2>Add New Product</h2>
+				<form action="">
+					<div class="lc">
+						<p class="it">
+							<img src="img/product-thumb.png" width="135" alt="">
+							<a href="" class="button next">Edit</a>
+						</p>
+						<p class="wh">
+							<label for="product-height">Height</label><br>
+							<input type="number" name="product-height" id="product-height" placeholder="18cm" value="<% print(product.get('Height')) %>">
+							<br>
+							<label for="product-width">Width</label><br>
+							<input type="number" name="product-width" id="product-width" placeholder="5cm" value="<% print(product.get('Width')) %>">
+						</p>
+					</div>
+					<div class="rc">
+						<p class="">
+							<label for="product-name">Product Name</label><br>
+							<input type="text" name="product-name" id="product-name" placeholder="Burts Bees Orange Essence" value="<% print( htmlEncode(product.get('Name')) ) %>">
+						</p>
+						<p class="fl">
+							<label for="product-brand">Brand</label><br>
+							<input type="text" name="product-brand" id="product-brand" placeholder="Burts Bees">
+						</p>
+						<p class="fr">
+							<label for="product-manufacturer">Manufacturer</label><br>
+							<input type="text" name="product-manufacturer" id="product-manufacturer" placeholder="Burts Bees">
+						</p>
+						<p class="">
+							<label for="product-category">Category</label><br>
+							<!--div class="control-group"-->
+								<select id="product-category" class="demo-default" placeholder="Category...">
+									<option value="">Category...</option>
+									<% _.each(categories, function(category) {
+										if(category.parent==0){
+									 %>
+    									<option value="<%= category.id %>"><%= category.name %></option>
+									<% } }); %>
+									<!--option value="4">Thomas Edison</option-->
+								</select>
+							<!--/div>
+							<div class="control-group"-->
+								<select id="product-subcategory" class="demo-default" placeholder="Subcategory...">
+									<option value="">Subcategory...</option>
+									<% _.each(categories, function(category) {
+										if(category.parent!=0){
+									 %>
+    									<option value="<%= category.id %>"><%= category.name %></option>
+									<% } }); %>
+								</select>
+						</p>
+						<p class="">
+							<label for="product-format">Format</label><br>
+							<input type="text" name="product-format" id="product-format" placeholder="Tube">
+						</p>
+						<p class="">
+							<label for="product-barcode">Barcode</label><br>
+							<input type="text" name="product-barcode" id="product-barcode" placeholder="78901234567890">
+						</p>
+					</div>
+				</form>
+				<br>
+				<div class="cancel">
+					<div class="fl"><a href="">cancel</a></div>
+					<div class="fr">
+						<a href="" class="button back">&lt; Back</a>
+						<a href="" class="button next">Save</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/template" id="new-product5">
+	<div class="popup">
+		<div class="popupCnt new-product s5">
+			<div class="resource-list">
+				<h2>New Product<br>
+					Successfully Added</h2>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="product-info">
+	<div class="popup">
+		<div class="popupCnt new-product s4">
+			<div class="resource-list">
+				<h2>Product Info</h2>
+				<form action="">
+					<div class="lc">
+						<p class="it">
+							<img src="img/products/<% print(parseInt(product.UPC)) %>.png" alt="<% print( htmlEncode(product.Name) ) %>"><br>
+							<a href="" class="button next">Edit</a>
+						</p>
+						<p class="wh">
+							<label for="product-height">Height</label><br>
+							<input disabled="disabled" type="number" name="product-height" id="product-height" value="<% print(parseInt(product.Height)) %>">
+							<br>
+							<label for="product-width">Width</label><br>
+							<input disabled="disabled" type="number" name="product-width" id="product-width" value="<% print(parseInt(product.Width)) %>">
+						</p>
+					</div>
+					<div class="rc">
+						<p class="">
+							<label for="product-name">Product Name</label><br>
+							<input disabled="disabled" type="text" name="product-name" id="product-name" value="<% print( htmlEncode(product.Name) ) %>">
+						</p>
+						<p class="fl">
+							<label for="product-brand">Brand</label><br>
+							<input disabled="disabled" type="text" name="product-brand" id="product-brand" value="<% print( htmlEncode(product.Brand) ) %>">
+						</p>
+						<p class="fr">
+							<label for="product-manufacturer">Manufacturer</label><br>
+							<input disabled="disabled" type="text" name="product-manufacturer" id="product-manufacturer" value="<% print( htmlEncode(product.Manufacturer) ) %>">
+						</p>
+						<p class="">
+							<label for="product-category">Category</label><br>
+							<input disabled="disabled" type="text" name="product-category" id="product-category" value="<% print( htmlEncode(product.Category) ) %>">
+						</p>
+						<p class="">
+							<label for="product-subcategory">Category</label><br>
+							<input disabled="disabled" type="text" name="product-subcategory" id="product-subcategory" value="<% print( htmlEncode(product.Subcategory) ) %>">
+						</p>
+						<p class="">
+							<label for="product-format">Format</label><br>
+							<input disabled="disabled" type="text" name="product-format" id="product-format" value="<% print( htmlEncode(product.Size) ) %>">
+						</p>
+						<p class="">
+							<label for="product-barcode">Barcode</label><br>
+							<input disabled="disabled" type="text" name="product-barcode" id="product-barcode" value="<% print( htmlEncode(product.UPC) ) %>">
+						</p>
+					</div>
+				</form>
+				<br>
+				<div class="cancel">
+					<div class="fl"><a href="">cancel</a></div>
+					<div class="fr">
+						<a href="" class="button next">OK</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script src="js/utils.js"></script>
+<script src="js/models/project-model.js"></script>
+<script src="js/models/product-model.js"></script>
+<script src="js/models/product-category-model.js"></script>
+<script src="js/models/product-my-model.js"></script>
+<script src="js/models/bay-model.js"></script>
+<script src="js/models/shelf-model.js"></script>
+<script src="js/models/shelf-item-model.js"></script>
+<!--script src="js/models/product-model.js"></script-->
+<script src="js/collections/project-collection.js"></script>
+<script src="js/collections/bay-collection.js"></script>
+<script src="js/collections/shelf-collection.js"></script>
+<script src="js/collections/shelf-item-collection.js"></script>
+<script src="js/collections/product-collection-bck.js"></script>
+<script src="js/collections/product-category-collection.js"></script>
+<script src="js/collections/product-my-collection.js"></script>
+<!--script src="js/collections/product-collection.js"></script-->
+<script src="js/views/app-view.js"></script>
+<script src="js/views/project-list-view.js"></script>
+<script src="js/views/project-edit-view.js"></script>
+<script src="js/views/project-preview.js"></script>
+<script src="js/views/bay-view.js"></script>
+<script src="js/views/bay-edit.js"></script>
+<script src="js/views/bay-delete.js"></script>
+<script src="js/views/shelf-view.js"></script>
+<script src="js/views/shelf-delete.js"></script>
+<script src="js/views/shelf-nofit.js"></script>
+<script src="js/views/shelf-nofit2.js"></script>
+<script src="js/views/product-view.js"></script>
+<script src="js/views/product-info.js"></script>
+<script src="js/views/product-bar-view.js"></script>
+<script src="js/views/new-product-view1.js"></script>
+<script src="js/views/new-product-view2.js"></script>
+<script src="js/views/new-product-view3.js"></script>
+<script src="js/views/new-product-view4.js"></script>
+<script src="js/views/new-product-view5.js"></script>
+<!--script src="js/routers/router.js"></script-->
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
